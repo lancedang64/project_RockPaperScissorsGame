@@ -19,7 +19,7 @@
         printResult(ROUND_RESULT_TEXT);
         updateScoreDisplay(ROUND_RESULT);
         noRound++;        
-        if (noRound == 5) endGame();
+        if (playerWins == 5 || playerLosses == 5) endGame();
     }
 
     function getRoundResult(playerPlay,computerPlay) {
@@ -89,7 +89,7 @@
         const para = document.createElement("p");
         const gamelog = document.getElementById("gamelog");
 
-        if (noRound == 5) {
+        if (playerWins == 5 || playerLosses == 5) {
             para.style.backgroundColor = "lightgreen";
             para.style.fontWeight = "bold";
         } // highlight game over text
