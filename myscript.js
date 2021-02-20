@@ -5,97 +5,105 @@
 
     function getComputerPlay() {
         let choice = getRandomInt(3);
-        if (choice == 0) { return "Rock" }
-        else if (choice == 1) {return "Paper"}
-        else if (choice == 2) {return "Scissors"}
-    }
-
-    function getResult(result) {
-        if (result == "draw") {
-            return `${playerSelection} and ${computerSelection}. Draw!`;
-        } else if (result == "win") {
-            return `${playerSelection} and ${computerSelection}. You win!`;
-        } else if (result == "lose") {
-            return `${playerSelection} and ${computerSelection}. You lose!`;
-        }
-    }
-
-    function updateScore(result) {
-        if (result.search("Draw") > 0) { 
-            drawTimes++;
-            document.getElementById("Draws").textContent = `Draws: ` + `${drawTimes}`;
-        }
-        else if (result.search("win") > 0) { 
-            playerWin++; 
-            document.getElementById("Wins").textContent = `Wins: ` + `${playerWin}`;
-        }
-        else if (result.search("lose") > 0) { 
-            computerWin++;
-            document.getElementById("Losses").textContent = `Losses: ` + `${computerWin}`;
-        }
-        noRound++;
-        if (noRound == 5) printResult(getFinal(playerWin, computerWin));
-    }
-
-    function getFinal(playerWin, computerWin) {
-        if (playerWin == computerWin) { return "Draw!"}
-        else if (playerWin > computerWin)  { return "You are the winner!"}
-        else { return "The computer is the winner!"}
+        if (choice == 0) return "Rock";
+        else if (choice == 1) return "Paper";
+        else if (choice == 2) return "Scissors";
     }
 
     function playRound(e) {
-        playerSelection = e.target.id;
-        computerSelection = getComputerPlay();
-        let result;
+        const PLAYER_PLAY  = e.target.id;
+        const COMPUTER_PLAY = getComputerPlay();
+        const ROUND_RESULT = getRoundResult(PLAYER_PLAY, COMPUTER_PLAY);
+        const ROUND_RESULT_TEXT = getResultText(ROUND_RESULT, PLAYER_PLAY, COMPUTER_PLAY);
 
-        if (playerSelection == computerSelection) {
-            result = getResult("draw");
-        }
-        else if (playerSelection == "Rock") {               
-            if (computerSelection == "Scissors") result = getResult("win");
-            else result = getResult("lose");
-        }
-        else if (playerSelection == "Paper") {
-            if (computerSelection =="Rock") result = getResult("win");
-            else result = getResult("lose"); 
-        }
-        else if (playerSelection == "Scissors") {
-            if (computerSelection =="Paper") result = getResult("win");
-            else result = getResult("lose"); 
-        }
-
-        printResult(result);
-        updateScore(result);
-        
+        printResult(ROUND_RESULT_TEXT);
+        updateScoreDisplay(ROUND_RESULT);
+        noRound++;        
         if (noRound == 5) endGame();
     }
 
+    function getRoundResult(playerPlay,computerPlay) {
+        if (playerPlay == computerPlay) {
+            return "draw";
+        }
+        else if (playerPlay == "Rock") {               
+            if (computerPlay == "Scissors") return "win";
+            else return "lose";
+        }
+        else if (playerPlay == "Paper") {
+            if (computerPlay =="Rock") return "win";
+            else return "lose"; 
+        }
+        else if (playerPlay == "Scissors") {
+            if (computerPlay =="Paper") return "win";
+            else return "lose"; 
+        }
+    }
+
+    function getResultText(result, playerPlay, computerPlay) {
+        if (result == "draw") {
+            return ` You chose ${playerPlay} and computer chose ${computerPlay}. Draw!`;
+        } else if (result == "win") {
+            return `You chose ${playerPlay} and computer chose ${computerPlay}. You win!`;
+        } else if (result == "lose") {
+            return `You chose ${playerPlay} and computer chose ${computerPlay}. You lose!`;
+        }
+    }
+
+    function updateScoreDisplay(result) {
+        if (result == "draw") { 
+            playerDraws++;
+            document.getElementById("Draws").textContent = `Draws: ` + `${playerDraws}`;
+        }
+        else if (result == "win") { 
+            playerWins++; 
+            document.getElementById("Wins").textContent = `Wins: ` + `${playerWins}`;
+        }
+        else if (result == "lose") { 
+            playerLosses++;
+            document.getElementById("Losses").textContent = `Losses: ` + `${playerLosses}`;
+        }
+        else if (result == "reset") {
+            
+        }
+    }
+
     function endGame() {
+        printResult(getGameOverText(playerWins,playerLosses));
+        disablePlayButtons();
+    }
+
+    function getGameOverText(playerWins, playerLosses) {
+        if (playerWins == playerLosses) { return "Game over! Draw!"}
+        else if (playerWins > playerLosses)  { return "You are the winner!"}
+        else { return "You lose, the computer is the winner!"}
+    }
+
+    function disablePlayButtons() {
         document.querySelectorAll("button.playButton").forEach(playButton => {
             playButton.removeEventListener('click', playRound);
         });
     }
 
-    function printResult(result) {
+    function printResult(resultText) {
         const para = document.createElement("p");
-        para.classList.add('singleLog');
-        para.textContent = result;
+        const gamelog = document.getElementById("gamelog");
 
         if (noRound == 5) {
             para.style.backgroundColor = "lightgreen";
             para.style.fontWeight = "bold";
-        }
-
-        const gamelog = document.getElementById("gamelog");
-        gamelog.appendChild(para); 
+        } // highlight game over text
         
+        para.classList.add('singleLog');
+        para.textContent = resultText;
+        gamelog.appendChild(para);
     }
 
     function resetGame(e) {
         noRound = 0;
-        playerWin = 0;
-        computerWin = 0;
-        drawTimes = 0;
+        playerWins = 0;
+        playerLosses = 0;
+        playerDraws = 0;
         document.getElementById("Draws").textContent = "Draws: 0";
         document.getElementById("Wins").textContent = "Wins: 0";
         document.getElementById("Losses").textContent = "Losses: 0"
@@ -111,10 +119,9 @@
         });
     }
 
-    let playerSelection, computerSelection, result;
-    let playerWin = 0;
-    let computerWin = 0;
-    let drawTimes = 0;
+    let playerWins = 0;
+    let playerLosses = 0;
+    let playerDraws = 0;
     let noRound = 0;
 
     const playButtons = document.querySelectorAll("button.playButton");
